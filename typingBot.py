@@ -1,15 +1,16 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from bs4 import BeautifulSoup
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import time
 
 
 def extract_text_from_span_box(driver):
     # Find the span elements containing each letter in the box
-    span_elements = driver.find_elements_by_xpath('//*[@id="root"]/div/div[4]/div[1]/div/div[2]/div/span')
+    span_elements = driver.find_elements(By.XPATH, '//*[@id="root"]/div/div[4]/div[1]/div/div[2]/div/span')
 
     # Extract text from each span element
-    extracted_text = ''.join([span.text for span in span_elements])
+    extracted_text = ''.join([span.text if span.text != '' else ' ' for span in span_elements])
 
     return extracted_text
 
@@ -26,10 +27,10 @@ def main():
     # Navigate to the web application
     driver.get(url)
 
-    # Wait for the page to load (you might need to adjust the sleep duration)
-    time.sleep(3)
-
     try:
+        # Wait for the span elements to be present
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.XPATH, '//*[@id="root"]/div/div[4]/div[1]/div/div[2]/div/span')))
+
         # Extract text from the span box
         extracted_text = extract_text_from_span_box(driver)
 
@@ -37,16 +38,12 @@ def main():
         print("Extracted Text:", extracted_text)
 
         # Find the certain box where you want to write the text
-        target_box = driver.find_element_by_xpath('//*[@id="root"]/div/div[4]/div[1]/div/div[2]/div')
+        target_box = driver.find_element(By.XPATH, '//*[@id="root"]/div/div[4]/div[1]/div/div[2]/div')
 
-        # Clear the existing text in the box
-        target_box.clear()
+        # Write the extracted text into the box
+        target_box.send_keys(extracted_text)
 
-        # Write the extracted text into the box (remove spaces)
-        target_box.send_keys(extracted_text.replace(" ", ""))
-
-        # Press Enter (optional, you can remove this if not needed)
-        target_box.send_keys(Keys.ENTER)
+        time.sleep(5)
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
