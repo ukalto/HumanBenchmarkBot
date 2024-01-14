@@ -4,5 +4,5 @@ This project is for leaning purposes only and tries to use code to solve tasks o
 
 ## Bots
 
-- [Reaction Time](reactiontime.py)
+- [Reaction Time](reactiontimeBot.py)
 - [Typing](typingBot.py)
